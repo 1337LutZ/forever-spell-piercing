@@ -45,6 +45,13 @@ npm run build
 This copies the four site files into `dist/`, which holds nothing else (no `.git`, tests or README). Upload that
 folder to Cloudflare Pages.
 
+`.github/workflows/deploy.yml` does this on every push to `main` (or by hand from the Actions tab): it runs the tests,
+builds `dist/` and deploys it to the Cloudflare Pages project `forever-spell-piercing`, creating the project on the
+first run. It needs two repository secrets:
+
+- `CLOUDFLARE_API_TOKEN`: an API token with the Cloudflare Pages: Edit permission
+- `CLOUDFLARE_ACCOUNT_ID`: the account the project lives in
+
 ## Tests
 
 ```bash
