@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Spell Piercing Calculator</title>
+    <meta
+      name="description"
+      content="How Spell Piercing, target resistance and Curse of the Elements change your spell damage in World of Warcraft: Forever."
+    />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M4 28 22 10l2-6 4-2-2 4-6 2L6 26z' fill='%236d4bd1'/%3E%3C/svg%3E"
+    />
+    <link rel="stylesheet" href="style.css" />
+    <script type="module" src="app.js"></script>
+  </head>
+  <body>
+    <header class="page-header">
+      <h1>Spell Piercing Calculator</h1>
+      <p class="lede">
+        How Spell Piercing, target resistance and Curse of the Elements change your spell damage in World of
+        Warcraft: Forever. The numbers follow the rules WoWSims Forever uses, measured from combat logs.
+      </p>
+    </header>
+
+    <main class="layout">
+      <form id="inputs" class="panel inputs" autocomplete="off">
+        <fieldset>
+          <legend>Your spell</legend>
+          <label class="field">
+            <span>Caster level</span>
+            <span class="range-row">
+              <input type="range" id="level-range" min="1" max="60" step="1" />
+              <input type="number" id="level" name="level" min="1" max="60" step="1" />
+            </span>
+          </label>
+          <label class="field">
+            <span>School</span>
+            <select id="school" name="school">
+              <option value="arcane">Arcane</option>
+              <option value="fire">Fire</option>
+              <option value="frost">Frost</option>
+              <option value="nature">Nature</option>
+              <option value="shadow">Shadow</option>
+              <option value="holy">Holy</option>
+            </select>
+          </label>
+          <label class="field">
+            <span>Damage per hit, before resists</span>
+            <input type="number" id="damage" name="damage" min="0" step="1" />
+          </label>
+          <div class="field">
+            <span id="hit-type-label">Hit type</span>
+            <div class="segmented" role="radiogroup" aria-labelledby="hit-type-label">
+              <label><input type="radio" name="hitType" value="direct" /><span>Direct or channel</span></label>
+              <label><input type="radio" name="hitType" value="dot" /><span>DoT tick</span></label>
+              <label><input type="radio" name="hitType" value="binary" /><span>Binary</span></label>
+            </div>
+            <small id="hit-type-help" class="help"></small>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Spell Piercing</legend>
+          <label class="field">
+            <span>From gear and other sources</span>
+            <input type="number" id="gearPiercing" name="gearPiercing" min="0" step="1" />
+          </label>
+          <label class="check">
+            <input type="checkbox" id="arcaneSubtlety" name="arcaneSubtlety" />
+            <span>Arcane Subtlety <em>15, every school</em></span>
+          </label>
+          <label class="field">
+            <span>Rune of Perfection</span>
+            <select id="rune" name="rune">
+              <option value="0">None</option>
+              <option value="2">2 piercing, +4 in Forest and Grassland</option>
+              <option value="3">3 piercing, +7 in Forest and Grassland</option>
+            </select>
+          </label>
+          <label class="check" id="forest-row">
+            <input type="checkbox" id="forest" name="forest" />
+            <span>Fighting in a Forest or Grassland area</span>
+          </label>
+          <label class="check" id="baleflame-row">
+            <input type="checkbox" id="baleflame" name="baleflame" />
+            <span>Baleflame <em>+2, Fire only</em></span>
+          </label>
+          <label class="check" id="balefrost-row">
+            <input type="checkbox" id="balefrost" name="balefrost" />
+            <span>Balefrost <em>+3, Frost only</em></span>
+          </label>
+          <p class="total">Total Spell Piercing on this school: <strong id="total-piercing">0</strong></p>
+        </fieldset>
+
+        <fieldset>
+          <legend>Target</legend>
+          <p class="help">
+            The target's resistance to each school. No raid boss resistances have been measured yet, so enter the
+            values you want to test.
+          </p>
+          <div class="resist-grid">
+            <label class="field resist" data-school="arcane"
+              ><span>Arcane</span><input type="number" name="res-arcane" min="0" step="1"
+            /></label>
+            <label class="field resist" data-school="fire"
+              ><span>Fire</span><input type="number" name="res-fire" min="0" step="1"
+            /></label>
+            <label class="field resist" data-school="frost"
+              ><span>Frost</span><input type="number" name="res-frost" min="0" step="1"
+            /></label>
+            <label class="field resist" data-school="nature"
+              ><span>Nature</span><input type="number" name="res-nature" min="0" step="1"
+            /></label>
+            <label class="field resist" data-school="shadow"
+              ><span>Shadow</span><input type="number" name="res-shadow" min="0" step="1"
+            /></label>
+          </div>
+          <label class="field">
+            <span>Curse of the Elements</span>
+            <select id="curseRank" name="curseRank">
+              <option value="0">None</option>
+              <option value="1">Rank 1: -30 resistance, +4% damage taken</option>
+              <option value="2">Rank 2: -45 resistance, +6% damage taken</option>
+              <option value="3">Rank 3: -60 resistance, +8% damage taken</option>
+              <option value="4">Rank 4: -75 resistance, +10% damage taken</option>
+            </select>
+          </label>
+          <label class="field">
+            <span>Other resistance reduction</span>
+            <input type="number" id="debuffReduction" name="debuffReduction" min="0" step="1" />
+            <small class="help">Any other debuff that lowers the target's resistance on this school.</small>
+          </label>
+        </fieldset>
+
+        <div class="form-actions">
+          <button type="button" id="reset" class="button secondary">Reset</button>
+          <button type="button" id="share" class="button">Copy link</button>
+        </div>
+      </form>
+
+      <section class="panel results" aria-live="polite">
+        <h2>Result</h2>
+        <div class="stats">
+          <div class="stat">
+            <span class="stat-label">Resistance after debuffs</span>
+            <span class="stat-value" id="out-after-debuffs"></span>
+          </div>
+          <div class="stat">
+            <span class="stat-label">After Spell Piercing</span>
+            <span class="stat-value" id="out-effective"></span>
+          </div>
+          <div class="stat">
+            <span class="stat-label" id="out-average-label">Average bonus</span>
+            <span class="stat-value" id="out-average"></span>
+          </div>
+          <div class="stat">
+            <span class="stat-label">Expected damage per hit</span>
+            <span class="stat-value" id="out-expected"></span>
+            <span class="stat-sub" id="out-gain"></span>
+          </div>
+        </div>
+        <p class="note" id="out-note"></p>
+
+        <h3>What each hit can roll</h3>
+        <div id="steps" class="steps"></div>
+
+        <h3>Average damage change by Spell Piercing</h3>
+        <p class="help">The rest of your settings stay as they are. The dot marks your current piercing.</p>
+        <div id="chart" class="chart"></div>
+      </section>
+    </main>
+
+    <article class="panel explainer">
+      <h2>How Spell Piercing works</h2>
+      <p>
+        Spell Piercing doesn't add a flat amount of damage. Each hit rolls a step: <strong>+0%</strong>,
+        <strong>+10%</strong>, <strong>+20%</strong>, and at high values <strong>+30%</strong>. In the combat log the
+        bonus shows up as a negative <code>resisted</code> number.
+      </p>
+      <ol>
+        <li>
+          Debuffs like Curse of the Elements lower the target's resistance, but never below 0. A debuff that would take
+          it lower adds nothing.
+        </li>
+        <li>
+          Spell Piercing comes off what's left. Once it passes 0, the rest turns into bonus damage. Against a target
+          with no resistance, all of it is bonus.
+        </li>
+        <li>
+          The average share is <strong>R / (|R| + 9 &times; your level)</strong>, where R is the resistance after
+          debuffs minus your piercing. A positive share is resisted damage, a negative one is bonus damage.
+        </li>
+        <li>
+          Up to an average of 10%, each hit lands on 0, 10 or 20% at 1 &minus; 7.5a, 5a and 2.5a. Past 10%, every 10%
+          step within 20 points of the average can come up, at 0.5 &minus; 2.5 &times; its distance from the average.
+        </li>
+      </ol>
+      <p>
+        The share depends on <strong>your</strong> level, not the target's, so the same piercing is worth less as you
+        level. Holy has no resistance in Forever and takes no piercing.
+      </p>
+
+      <h3>Hit types</h3>
+      <ul>
+        <li><strong>Direct or channel:</strong> rolls the full share. Channel ticks such as Mind Flay count here.</li>
+        <li>
+          <strong>DoT tick:</strong> the sim rolls a tenth of the share. Logs show partial resists on ticks at about a
+          tenth. No bonus from piercing has shown up on a tick yet.
+        </li>
+        <li>
+          <strong>Binary:</strong> spells with an effect besides damage, such as Frostbolt's slow. The average share is
+          the chance to resist the whole spell, and one that lands still rolls its damage like a direct hit.
+        </li>
+      </ul>
+
+      <h3>What the logs show</h3>
+      <ul>
+        <li>
+          15 piercing at around level 22, almost 3,000 hits: +10% came up exactly twice as often as +20%, for an
+          average bonus of 7.5%. Every school takes it, and crits roll the same as normal hits.
+        </li>
+        <li>A Fireball log with more piercing shows the +30% step once the average passes 10%.</li>
+        <li>No bonus has shown up on DoT ticks in more than 1,000 ticks from a caster with 7 piercing.</li>
+        <li>A caster with 1 piercing got no bonus in 1,791 hits, where the formula expects a few percent.</li>
+        <li>
+          The 9 &times; level constant is fitted to logs from levels 20 to 30. Above that the numbers are the model's
+          prediction until someone logs it.
+        </li>
+      </ul>
+    </article>
+
+    <footer class="page-footer">
+      <p>
+        Uses the resist rules from
+        <a href="https://github.com/wowsims/forever">WoWSims Forever</a>. Curse of the Elements and the piercing
+        sources come from the game data.
+      </p>
+    </footer>
+  </body>
+</html>
