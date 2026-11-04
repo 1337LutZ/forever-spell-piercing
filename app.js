@@ -1,19 +1,13 @@
 import { analyse, expectedWithoutPiercing } from "./piercing.js";
 
 const RESIST_SCHOOLS = ["arcane", "fire", "frost", "nature", "shadow"];
-const RUNE_FOREST_BONUS = { 2: 4, 3: 7 };
 
 const DEFAULTS = {
   level: 60,
   school: "frost",
   damage: 882,
   hitType: "direct",
-  gearPiercing: 0,
-  arcaneSubtlety: true,
-  rune: 0,
-  forest: false,
-  baleflame: false,
-  balefrost: false,
+  piercing: 15,
   curseRank: 0,
   debuffReduction: 0,
   ...Object.fromEntries(RESIST_SCHOOLS.map((s) => [`res-${s}`, 0])),
@@ -32,9 +26,7 @@ function readState() {
   const state = {};
   for (const [key, fallback] of Object.entries(DEFAULTS)) {
     const element = form.elements[key];
-    if (typeof fallback === "boolean") {
-      state[key] = element.checked;
-    } else if (typeof fallback === "number") {
+    if (typeof fallback === "number") {
       const value = Number(element.value);
       state[key] = Number.isFinite(value) ? value : fallback;
     } else {
@@ -48,12 +40,7 @@ function readState() {
 function writeState(state) {
   for (const [key, value] of Object.entries(state)) {
     const element = form.elements[key];
-    if (!element) continue;
-    if (typeof value === "boolean") {
-      element.checked = value;
-    } else {
-      element.value = value;
-    }
+    if (element) element.value = value;
   }
   $("level-range").value = state.level;
 }
@@ -64,9 +51,7 @@ function stateFromHash() {
   for (const [key, fallback] of Object.entries(DEFAULTS)) {
     if (!params.has(key)) continue;
     const raw = params.get(key);
-    if (typeof fallback === "boolean") {
-      state[key] = raw === "1";
-    } else if (typeof fallback === "number") {
+    if (typeof fallback === "number") {
       const value = Number(raw);
       if (Number.isFinite(value)) state[key] = value;
     } else {
@@ -80,23 +65,10 @@ function hashFromState(state) {
   const params = new URLSearchParams();
   for (const [key, value] of Object.entries(state)) {
     if (value === DEFAULTS[key]) continue;
-    params.set(key, typeof value === "boolean" ? (value ? "1" : "0") : String(value));
+    params.set(key, String(value));
   }
   const text = params.toString();
   return text ? `#${text}` : "";
-}
-
-function totalPiercing(state) {
-  if (state.school === "holy") return 0;
-  let total = state.gearPiercing;
-  if (state.arcaneSubtlety) total += 15;
-  if (state.rune > 0) {
-    total += state.rune;
-    if (state.forest) total += RUNE_FOREST_BONUS[state.rune] ?? 0;
-  }
-  if (state.baleflame && state.school === "fire") total += 2;
-  if (state.balefrost && state.school === "frost") total += 3;
-  return total;
 }
 
 function simInput(state, piercing) {
@@ -120,7 +92,6 @@ const formatPercent = (value, digits = 1) => `${formatNumber(value * 100, digits
 const signed = (value, text) => (value > 0 ? `+${text}` : value < 0 ? `−${text.replace("-", "")}` : text);
 
 function renderSummary(state, piercing, result) {
-  $("total-piercing").textContent = piercing;
   $("out-after-debuffs").textContent = state.school === "holy" ? "None" : formatNumber(result.resistanceAfterDebuffs);
   const effective = $("out-effective");
   effective.textContent = state.school === "holy" ? "None" : formatNumber(result.effectiveResistance);
@@ -228,14 +199,11 @@ function renderChart(state, piercing) {
 
 function render() {
   const state = readState();
-  const piercing = totalPiercing(state);
+  const piercing = Math.max(0, Math.round(state.piercing));
   const result = analyse(simInput(state, piercing));
 
   $("level-range").value = state.level;
   $("hit-type-help").textContent = HIT_TYPE_HELP[state.hitType];
-  $("baleflame-row").classList.toggle("disabled", state.school !== "fire");
-  $("balefrost-row").classList.toggle("disabled", state.school !== "frost");
-  $("forest-row").classList.toggle("disabled", state.rune === 0);
   for (const element of form.querySelectorAll(".resist")) {
     element.classList.toggle("active", element.dataset.school === state.school);
   }

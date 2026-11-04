@@ -3,7 +3,7 @@
 A small static page for testing how Spell Piercing, target resistance and Curse of the Elements change spell damage in
 World of Warcraft: Forever.
 
-Set your level, school, damage per hit and hit type, add your piercing sources, and enter the target's resistances.
+Set your level, school, damage per hit, hit type and Spell Piercing, and enter the target's resistances.
 The page shows:
 
 - the resistance left after debuffs and after piercing

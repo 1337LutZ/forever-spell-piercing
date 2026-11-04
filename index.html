@@ -66,34 +66,10 @@
         <fieldset>
           <legend>Spell Piercing</legend>
           <label class="field">
-            <span>From gear and other sources</span>
-            <input type="number" id="gearPiercing" name="gearPiercing" min="0" step="1" />
+            <span>Spell Piercing on this school</span>
+            <input type="number" id="piercing" name="piercing" min="0" step="1" />
+            <small class="help">The value from your character sheet, talents and gear included.</small>
           </label>
-          <label class="check">
-            <input type="checkbox" id="arcaneSubtlety" name="arcaneSubtlety" />
-            <span>Arcane Subtlety <em>15, every school</em></span>
-          </label>
-          <label class="field">
-            <span>Rune of Perfection</span>
-            <select id="rune" name="rune">
-              <option value="0">None</option>
-              <option value="2">2 piercing, +4 in Forest and Grassland</option>
-              <option value="3">3 piercing, +7 in Forest and Grassland</option>
-            </select>
-          </label>
-          <label class="check" id="forest-row">
-            <input type="checkbox" id="forest" name="forest" />
-            <span>Fighting in a Forest or Grassland area</span>
-          </label>
-          <label class="check" id="baleflame-row">
-            <input type="checkbox" id="baleflame" name="baleflame" />
-            <span>Baleflame <em>+2, Fire only</em></span>
-          </label>
-          <label class="check" id="balefrost-row">
-            <input type="checkbox" id="balefrost" name="balefrost" />
-            <span>Balefrost <em>+3, Frost only</em></span>
-          </label>
-          <p class="total">Total Spell Piercing on this school: <strong id="total-piercing">0</strong></p>
         </fieldset>
 
         <fieldset>
@@ -236,8 +212,8 @@
     <footer class="page-footer">
       <p>
         Uses the resist rules from
-        <a href="https://github.com/wowsims/forever">WoWSims Forever</a>. Curse of the Elements and the piercing
-        sources come from the game data.
+        <a href="https://github.com/wowsims/forever">WoWSims Forever</a>. Curse of the Elements comes from the game
+        data.
       </p>
     </footer>
   </body>

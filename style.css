@@ -204,20 +204,6 @@ button:focus-visible,
   font-weight: 600;
 }
 
-.check {
-  display: flex;
-  gap: 8px;
-  align-items: flex-start;
-  margin-bottom: 10px;
-  cursor: pointer;
-}
-
-.check input {
-  accent-color: var(--accent);
-  margin-top: 3px;
-}
-
-.check em,
 .help {
   color: var(--muted);
   font-style: normal;
@@ -231,18 +217,6 @@ button:focus-visible,
 
 .field .help {
   margin: 2px 0 0;
-}
-
-.disabled {
-  opacity: 0.45;
-}
-
-.total {
-  margin: 4px 0 0;
-  padding: 8px 10px;
-  background: var(--accent-soft);
-  border-radius: 7px;
-  font-size: 0.9rem;
 }
 
 .resist-grid {
