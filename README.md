@@ -36,6 +36,15 @@ python3 -m http.server 8000
 
 Then open <http://localhost:8000>.
 
+## Deploying
+
+```bash
+npm run build
+```
+
+This copies the four site files into `dist/`, which holds nothing else (no `.git`, tests or README). Upload that
+folder to Cloudflare Pages.
+
 ## Tests
 
 ```bash
