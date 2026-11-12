@@ -1,5 +1,5 @@
 // The resist and Spell Piercing rules WoWSims Forever uses (sim/core/spell_resistances.go), fitted to
-// combat logs from levels 20 to 30.
+// combat logs from levels 20 to 50.
 
 export const SCHOOLS = ["arcane", "fire", "frost", "nature", "shadow", "holy"];
 
