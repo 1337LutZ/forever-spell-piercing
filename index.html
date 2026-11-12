@@ -167,7 +167,7 @@
           with no resistance, all of it is bonus.
         </li>
         <li>
-          The average share is <strong>R / (|R| + 9 &times; your level)</strong>, where R is the resistance after
+          The average share is <strong>R / (|R| + 8 &times; your level + 19)</strong>, where R is the resistance after
           debuffs minus your piercing. A positive share is resisted damage, a negative one is bonus damage.
         </li>
         <li>
@@ -203,8 +203,8 @@
         <li>No bonus has shown up on DoT ticks in more than 1,000 ticks from a caster with 7 piercing.</li>
         <li>A caster with 1 piercing got no bonus in 1,791 hits, where the formula expects a few percent.</li>
         <li>
-          The 9 &times; level constant is fitted to logs from levels 20 to 30. Above that the numbers are the model's
-          prediction until someone logs it.
+          The 8 &times; level + 19 constant is fitted to logs from levels 20 to 50, among them 15 piercing at level 50
+          (5,756 hits, 26% with a bonus). Level 60 is the model's prediction until someone logs it.
         </li>
       </ul>
     </article>

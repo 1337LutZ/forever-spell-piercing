@@ -20,11 +20,11 @@ The math in `piercing.js` follows the resist rules in
 
 - Debuffs lower the target's resistance, but not below 0.
 - Spell Piercing comes off what's left. Past 0, the rest is bonus damage.
-- The average share is `R / (|R| + 9 × caster level)`. A DoT tick rolls a tenth of it. Holy has no resistance.
+- The average share is `R / (|R| + 8 × caster level + 19)`. A DoT tick rolls a tenth of it. Holy has no resistance.
 - Each hit rolls a whole 10% step around that average.
 - A binary spell is fully resisted with the average as its chance, and one that lands rolls its damage.
 
-The `9 × level` constant is fitted to combat logs from levels 20 to 30.
+The `8 × level + 19` constant is fitted to combat logs from levels 20 to 50.
 
 ## Running it
 

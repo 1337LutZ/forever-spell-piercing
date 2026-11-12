@@ -19,7 +19,7 @@ export function resistanceAfterDebuffs(targetResistance, debuffReduction) {
   return Math.max(0, Math.max(0, targetResistance) - debuffReduction);
 }
 
-// The average share of the damage resisted, R / (|R| + 9L), with the caster's Spell Piercing taken off
+// The average share of the damage resisted, R / (|R| + 8L + 19), with the caster's Spell Piercing taken off
 // R. Piercing past 0 makes the share negative: the roll pays it out as bonus damage. Holy has no
 // resistance and takes no piercing. A DoT tick rolls against a tenth of it.
 export function averageResist({ level, school, targetResistance, debuffReduction, piercing, periodic }) {
@@ -27,7 +27,7 @@ export function averageResist({ level, school, targetResistance, debuffReduction
     return 0;
   }
   const resistance = resistanceAfterDebuffs(targetResistance, debuffReduction) - piercing;
-  const average = resistance / (Math.abs(resistance) + 9 * level);
+  const average = resistance / (Math.abs(resistance) + 8 * level + 19);
   return periodic ? average / 10 : average;
 }
 
