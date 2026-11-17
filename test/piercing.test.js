@@ -33,8 +33,10 @@ test("holy takes no resistance and no piercing", () => {
   assert.equal(averageResist({ ...base, school: "holy", targetResistance: 100, piercing: 50 }), 0);
 });
 
-test("a DoT tick rolls against a tenth of the average", () => {
-  close(averageResist({ ...base, piercing: 50, periodic: true }), -5 / 549);
+test("a tick at a tenth rolls against a tenth of the positive share", () => {
+  close(averageResist({ ...base, targetResistance: 100, tenth: true }), 10 / 599);
+  close(averageResist({ ...base, targetResistance: 100, piercing: 50, tenth: true }), 5 / 549);
+  assert.equal(averageResist({ ...base, piercing: 50, tenth: true }), 0);
 });
 
 test("up to 10% the roll is 1 - 7.5a, 5a and 2.5a", () => {
@@ -89,15 +91,94 @@ test("piercing pays out as bonus steps, a resisted hit as resisted steps", () =>
   close(resisted.expected, 1000 * (1 - 100 / 599));
 });
 
-test("a binary spell is fully resisted at the average and rolls the rest", () => {
+test("a binary spell is fully resisted at the average, and one that lands takes its full damage", () => {
   const result = analyse({ ...base, hitType: "binary", targetResistance: 100 });
   close(result.fullResistChance, 100 / 599);
-  assert.equal(result.steps[0].fullResist, true);
-  close(
-    result.steps.reduce((sum, s) => sum + s.chance, 0),
-    1,
+  assert.deepEqual(
+    result.steps.map((s) => [s.percent, s.fullResist === true]),
+    [
+      [-100, true],
+      [0, false],
+    ],
   );
-  close(result.expected, 1000 * (1 - 100 / 599) ** 2);
+  close(result.steps[1].chance, 1 - 100 / 599);
+  close(result.steps[1].damage, 1000);
+  close(result.expected, 1000 * (1 - 100 / 599));
+});
+
+test("piercing lowers a binary spell's full resist chance to 0 and adds no bonus", () => {
+  const partly = analyse({ ...base, hitType: "binary", targetResistance: 100, piercing: 60 });
+  close(partly.fullResistChance, 40 / 539);
+  close(partly.expected, 1000 * (1 - 40 / 539));
+
+  const past = analyse({ ...base, hitType: "binary", targetResistance: 100, piercing: 150 });
+  assert.equal(past.fullResistChance, 0);
+  assert.deepEqual(
+    past.steps.map((s) => [s.percent, s.chance, s.damage]),
+    [[0, 1, 1000]],
+  );
+  close(past.expected, 1000);
+});
+
+test("a tick at a tenth takes a tenth of the resist and no bonus from piercing", () => {
+  const resisted = analyse({ ...base, hitType: "dot", targetResistance: 100 });
+  assert.deepEqual(
+    resisted.steps.map((s) => s.percent),
+    [0, -10, -20],
+  );
+  close(resisted.expected, 1000 * (1 - 10 / 599));
+
+  const pierced = analyse({ ...base, hitType: "dot", piercing: 50 });
+  assert.deepEqual(
+    pierced.steps.map((s) => [s.percent, s.chance]),
+    [[0, 1]],
+  );
+  close(pierced.expected, 1000);
+});
+
+test("a tick at the full share takes the piercing bonus a tick at a tenth does not", () => {
+  const full = analyse({ ...base, hitType: "direct", piercing: 50 });
+  assert.deepEqual(
+    full.steps.map((s) => s.percent),
+    [0, 10, 20],
+  );
+  close(full.expected, 1000 * (1 + 50 / 549));
+  close(analyse({ ...base, hitType: "dot", piercing: 50 }).expected, 1000);
+});
+
+test("past the target's resistance, more piercing changes nothing on binary spells and ticks at a tenth", () => {
+  for (const hitType of ["binary", "dot"]) {
+    const atZero = analyse({ ...base, hitType, targetResistance: 100, piercing: 100 });
+    const past = analyse({ ...base, hitType, targetResistance: 100, piercing: 150 });
+    close(atZero.expected, 1000);
+    close(past.expected, atZero.expected);
+  }
+});
+
+test("around an average of 74% the 80 and 90% steps land on 75%", () => {
+  const result = analyse({ ...base, school: "shadow", targetResistance: (0.74 * 499) / 0.26 });
+  close(result.average, 0.74);
+  assert.deepEqual(
+    result.steps.map((s) => s.percent),
+    [-60, -70, -75],
+  );
+  close(result.steps[0].chance, 0.15);
+  close(result.steps[1].chance, 0.4);
+  close(result.steps[2].chance, 0.45);
+  close(result.steps[2].damage, 250);
+  close(result.share, 0.7075);
+  close(result.expected, 292.5);
+});
+
+test("a direct hit is never fully resisted through the roll", () => {
+  const result = analyse({ ...base, targetResistance: 10000 });
+  assert.ok(result.average > 0.9);
+  assert.deepEqual(
+    result.steps.map((s) => [s.percent, s.fullResist === true]),
+    [[-75, false]],
+  );
+  close(result.steps[0].chance, 1);
+  close(result.expected, 250);
 });
 
 test("Curse of the Elements lowers resistance and raises the damage", () => {

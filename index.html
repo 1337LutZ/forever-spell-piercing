@@ -55,8 +55,8 @@
           <div class="field">
             <span id="hit-type-label">Hit type</span>
             <div class="segmented" role="radiogroup" aria-labelledby="hit-type-label">
-              <label><input type="radio" name="hitType" value="direct" /><span>Direct or channel</span></label>
-              <label><input type="radio" name="hitType" value="dot" /><span>DoT tick</span></label>
+              <label><input type="radio" name="hitType" value="direct" /><span>Direct, channel or full-share tick</span></label>
+              <label><input type="radio" name="hitType" value="dot" /><span>DoT tick (tenth)</span></label>
               <label><input type="radio" name="hitType" value="binary" /><span>Binary</span></label>
             </div>
             <small id="hit-type-help" class="help"></small>
@@ -153,9 +153,10 @@
     <article class="panel explainer">
       <h2>How Spell Piercing works</h2>
       <p>
-        Spell Piercing doesn't add a flat amount of damage. Each hit rolls a step: <strong>+0%</strong>,
-        <strong>+10%</strong>, <strong>+20%</strong>, and at high values <strong>+30%</strong>. In the combat log the
-        bonus shows up as a negative <code>resisted</code> number.
+        Spell Piercing doesn't add a flat amount of damage. It is the other side of the partial resist roll: each hit
+        or tick at the full share rolls a step, <strong>+0%</strong>, <strong>+10%</strong>, <strong>+20%</strong>,
+        and at high values <strong>+30%</strong>. In the combat log the bonus shows up as a negative
+        <code>resisted</code> number. Binary spells and most DoT ticks roll no bonus at all.
       </p>
       <ol>
         <li>
@@ -164,7 +165,7 @@
         </li>
         <li>
           Spell Piercing comes off what's left. Once it passes 0, the rest turns into bonus damage. Against a target
-          with no resistance, all of it is bonus.
+          with no resistance, all of it is bonus on a hit at the full share.
         </li>
         <li>
           The average share is <strong>R / (|R| + 8 &times; your level + 19)</strong>, where R is the resistance after
@@ -174,6 +175,10 @@
           Up to an average of 10%, each hit lands on 0, 10 or 20% at 1 &minus; 7.5a, 5a and 2.5a. Past 10%, every 10%
           step within 20 points of the average can come up, at 0.5 &minus; 2.5 &times; its distance from the average.
         </li>
+        <li>
+          No partial resist takes more than 75%: the 80, 90 and 100% steps land on 75%. A spell that isn't binary is
+          never fully resisted through this roll.
+        </li>
       </ol>
       <p>
         The share depends on <strong>your</strong> level, not the target's, so the same piercing is worth less as you
@@ -182,25 +187,40 @@
 
       <h3>Hit types</h3>
       <ul>
-        <li><strong>Direct or channel:</strong> rolls the full share. Channel ticks such as Mind Flay count here.</li>
         <li>
-          <strong>DoT tick:</strong> the sim rolls a tenth of the share. Logs show partial resists on ticks at about a
-          tenth. No bonus from piercing has shown up on a tick yet.
+          <strong>Direct, channel or full-share tick:</strong> rolls the full share and takes the piercing bonus in
+          full. Fireball, Scorch, Pyroblast, Fire Blast, Shadow Bolt, the Arcane nukes, Lightning Bolt, Starfire, Wrath,
+          Blizzard's ticks, and the ticks of Devouring Plague, Pyroblast and Starshards.
         </li>
         <li>
-          <strong>Binary:</strong> spells with an effect besides damage, such as Frostbolt's slow. The average share is
-          the chance to resist the whole spell, and one that lands still rolls its damage like a direct hit.
+          <strong>DoT tick (tenth):</strong> rolls a tenth of the share, and only when the target still resists, so it
+          takes no piercing bonus. The sim lets piercing still lower the target's resistance first; the logs haven't
+          measured that yet. Most DoT ticks: Shadow Word:
+          Pain, Corruption, Flame Shock, Moonfire, Fireball's DoT, and Flamestrike's ground ticks.
+        </li>
+        <li>
+          <strong>Binary:</strong> a magic damage spell that has, besides the damage, a debuff on the target,
+          an interrupt, or a dummy, script, energize or area-trigger effect. The average share is the chance to resist
+          the whole spell. One that lands takes no partial resist and no piercing bonus, nor do its ticks, so piercing
+          only lowers the chance of a full resist, down to 0. Frostbolt, Frost Nova, Cone of Cold, Ice Lance,
+          Frostfire Bolt, Blast Wave, Arcane Wrath, Flamestrike's cast, Immolate, Incinerate, Shadow Word: Death, Mind
+          Flay, Earth Shock, Frost Shock, Insect Swarm, Hurricane and Bane of Agony.
         </li>
       </ul>
 
       <h3>What the logs show</h3>
       <ul>
         <li>
-          15 piercing at around level 22, almost 3,000 hits: +10% came up exactly twice as often as +20%, for an
-          average bonus of 7.5%. Every school takes it, and crits roll the same as normal hits.
+          15 piercing at around level 22, almost 3,000 hits on the beta realms: +10% came up exactly twice as often as
+          +20%, for an average bonus of 7.5%. Every school takes it, and crits roll the same as normal hits.
         </li>
         <li>A Fireball log with more piercing shows the +30% step once the average passes 10%.</li>
-        <li>No bonus has shown up on DoT ticks in more than 1,000 ticks from a caster with 7 piercing.</li>
+        <li>
+          On the live realms binary spells take no bonus: Frost Nova 0 of 1,258 hits, Cone of Cold 0 of 1,595, Arcane
+          Wrath 0 of 1,787. Nor do ticks at a tenth: Shadow Word: Pain 0 of 515 ticks at 8 piercing, Flamestrike's ground
+          ticks 0 of 4,177. Spells at the full share do: Fire Blast 439 of 1,686 hits, Pyroblast's ticks 56 of 280.
+        </li>
+        <li>No live hit loses more than 75%, and on the mobs that resist that much, 75% is the top step.</li>
         <li>A caster with 1 piercing got no bonus in 1,791 hits, where the formula expects a few percent.</li>
         <li>
           The 8 &times; level + 19 constant is fitted to logs from levels 20 to 50, among them 15 piercing at level 50

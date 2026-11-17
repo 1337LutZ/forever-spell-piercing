@@ -1,5 +1,5 @@
-// The resist and Spell Piercing rules WoWSims Forever uses (sim/core/spell_resistances.go), fitted to
-// combat logs from levels 20 to 50.
+// The live-realm resist and Spell Piercing rules WoWSims Forever uses (sim/core/spell_resistances.go),
+// fitted to combat logs.
 
 export const SCHOOLS = ["arcane", "fire", "frost", "nature", "shadow", "holy"];
 
@@ -21,14 +21,21 @@ export function resistanceAfterDebuffs(targetResistance, debuffReduction) {
 
 // The average share of the damage resisted, R / (|R| + 8L + 19), with the caster's Spell Piercing taken off
 // R. Piercing past 0 makes the share negative: the roll pays it out as bonus damage. Holy has no
-// resistance and takes no piercing. A DoT tick rolls against a tenth of it.
-export function averageResist({ level, school, targetResistance, debuffReduction, piercing, periodic }) {
+// resistance and takes no piercing. Most DoT ticks roll against a tenth of the share, and only its
+// positive part, so they take no bonus.
+export function averageResist({ level, school, targetResistance, debuffReduction, piercing, tenth }) {
   if (school === "holy") {
     return 0;
   }
   const resistance = resistanceAfterDebuffs(targetResistance, debuffReduction) - piercing;
   const average = resistance / (Math.abs(resistance) + 8 * level + 19);
-  return periodic ? average / 10 : average;
+  return tenth ? Math.max(0, average) / 10 : average;
+}
+
+// A partial resist never takes more than 75% of a hit: the roll's 80, 90 and 100% steps land on 75%.
+// The bonus side is capped the same way.
+export function resistedPercent(tenths) {
+  return Math.min(tenths * 10, 75);
 }
 
 // The roll in tenths of the damage around the average share a (0 to 1). Up to a = 10% it gives 0, 1 or
@@ -63,38 +70,54 @@ export function rollTenths(a) {
   return steps;
 }
 
-// Everything the page shows for one hit. Binary spells resist in full with the average share as the
-// chance; one that lands rolls its damage like any other hit.
+// Everything the page shows for one hit. hitType is "direct" for a direct hit, a channel tick that is
+// not binary or a tick at the full share, "dot" for a tick at a tenth of the share, and "binary" for a
+// binary spell. A binary spell resists in full on its hit roll with the average share as the chance,
+// and one that lands takes no partial resist and no bonus.
 export function analyse(options) {
   const curse = CURSE_OF_THE_ELEMENTS[options.curseRank] ?? CURSE_OF_THE_ELEMENTS[0];
   const input = { ...options, debuffReduction: options.debuffReduction + curse.resistance };
   const { damage, hitType } = input;
   const damageTaken = 1 + curse.damageTaken;
-  const periodic = hitType === "dot";
-  const average = averageResist({ ...input, periodic });
-  const fullResistChance = hitType === "binary" ? Math.max(0, average) : 0;
-  const sign = average < 0 ? 1 : -1;
+  const average = averageResist({ ...input, tenth: hitType === "dot" });
+  const full = damage * damageTaken;
 
-  const steps = rollTenths(Math.abs(average)).map(([tenths, chance]) => ({
-    percent: tenths === 0 ? 0 : sign * tenths * 10,
-    chance: chance * (1 - fullResistChance),
-    damage: damage * damageTaken * (1 + (sign * tenths) / 10),
-  }));
+  let fullResistChance = 0;
+  let steps;
+  let share;
+  if (hitType === "binary") {
+    fullResistChance = Math.max(0, average);
+    steps = [{ percent: 0, chance: 1 - fullResistChance, damage: full }];
+    share = fullResistChance;
+  } else {
+    const sign = average < 0 ? 1 : -1;
+    const byPercent = new Map();
+    for (const [tenths, chance] of rollTenths(Math.abs(average))) {
+      const percent = resistedPercent(tenths);
+      byPercent.set(percent, (byPercent.get(percent) ?? 0) + chance);
+    }
+    steps = [...byPercent].map(([percent, chance]) => ({
+      percent: percent === 0 ? 0 : sign * percent,
+      chance,
+      damage: full * (1 + (sign * percent) / 100),
+    }));
+    share = -sign * steps.reduce((sum, step) => sum + (step.chance * Math.abs(step.percent)) / 100, 0);
+  }
   if (fullResistChance > 0) {
     steps.unshift({ percent: -100, chance: fullResistChance, damage: 0, fullResist: true });
   }
 
-  const expected = damage * damageTaken * (1 - average) * (1 - fullResistChance);
   const afterDebuffs =
     input.school === "holy" ? 0 : resistanceAfterDebuffs(input.targetResistance, input.debuffReduction);
   return {
     resistanceAfterDebuffs: afterDebuffs,
     effectiveResistance: input.school === "holy" ? 0 : afterDebuffs - input.piercing,
     average,
+    share,
     fullResistChance,
     damageTaken,
     steps,
-    expected,
+    expected: full * (1 - share),
   };
 }
 
