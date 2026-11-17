@@ -14,9 +14,11 @@ const DEFAULTS = {
 };
 
 const HIT_TYPE_HELP = {
-  direct: "Rolls the full share. Channel ticks such as Mind Flay count here.",
-  dot: "The sim rolls a tenth of the share on each tick. Logs haven't shown piercing bonus on ticks yet.",
-  binary: "The average share is also the chance to resist the whole spell. One that lands rolls like a direct hit.",
+  direct:
+    "Rolls the full share and takes the piercing bonus. Fire Blast, Fireball, Lightning Bolt, Blizzard's ticks, and the ticks of Devouring Plague, Pyroblast and Starshards.",
+  dot: "Rolls a tenth of the share and takes no piercing bonus. Most DoT ticks: Shadow Word: Pain, Corruption, Flame Shock, Moonfire, Fireball's DoT, and Flamestrike's ground ticks.",
+  binary:
+    "The average share is the chance to resist the whole spell. One that lands takes no partial resist and no piercing bonus, nor do its ticks. Frostbolt, Frost Nova, Cone of Cold, Arcane Wrath, Flamestrike's cast, Immolate, Mind Flay, Earth Shock, Insect Swarm.",
 };
 
 const form = document.getElementById("inputs");
@@ -98,9 +100,10 @@ function renderSummary(state, piercing, result) {
   effective.className = `stat-value ${result.effectiveResistance < 0 ? "positive" : result.effectiveResistance > 0 ? "negative" : ""}`;
 
   const average = $("out-average");
-  $("out-average-label").textContent = result.average > 0 ? "Average resisted" : "Average bonus";
-  average.textContent = formatPercent(Math.abs(result.average), 2);
-  average.className = `stat-value ${result.average < 0 ? "positive" : result.average > 0 ? "negative" : ""}`;
+  $("out-average-label").textContent =
+    result.share > 0 || (result.share === 0 && state.hitType !== "direct") ? "Average resisted" : "Average bonus";
+  average.textContent = formatPercent(Math.abs(result.share), 2);
+  average.className = `stat-value ${result.share < 0 ? "positive" : result.share > 0 ? "negative" : ""}`;
 
   $("out-expected").textContent = formatNumber(result.expected, 1);
   const without = expectedWithoutPiercing(simInput(state, piercing));
@@ -125,6 +128,16 @@ function renderSummary(state, piercing, result) {
   if (state.school !== "holy" && wasted > 0 && curseReduction + state.debuffReduction > 0) {
     notes.push(
       `Your debuffs take off ${wasted} more resistance than the target has. Debuffs stop at 0, so that part adds nothing. Only Spell Piercing goes past 0.`,
+    );
+  }
+  if (state.school !== "holy" && state.hitType !== "direct" && result.effectiveResistance < 0) {
+    notes.push(
+      "Binary spells and ticks at a tenth take no piercing bonus, so piercing past the target's resistance adds nothing here.",
+    );
+  }
+  if (state.hitType === "direct" && result.average > 0 && Math.abs(result.share - result.average) > 1e-9) {
+    notes.push(
+      `The roll centres on ${formatPercent(result.average, 2)}, but no step goes past 75%, so the hit loses ${formatPercent(result.share, 2)} on average.`,
     );
   }
   if (state.curseRank > 0) {
