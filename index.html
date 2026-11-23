@@ -150,13 +150,37 @@
       </section>
     </main>
 
+    <section class="panel spell-table" aria-labelledby="spell-table-title">
+      <h2 id="spell-table-title">Which spells take the piercing bonus</h2>
+      <p class="help">
+        Piercing past the target's resistance turns into bonus damage only on the hits and ticks marked
+        <span class="mark yes">✓</span>. Every spell's piercing still lowers the target's resistance first. Holy has no
+        resistance, so Holy spells take none. "Counted in logs" means the bonus was counted on that spell; the rest
+        follow from the rules below.
+      </p>
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">Spell</th>
+              <th scope="col">School</th>
+              <th scope="col" class="mark">Hit</th>
+              <th scope="col" class="mark">Ticks</th>
+              <th scope="col">Basis</th>
+            </tr>
+          </thead>
+          <tbody id="spell-rows"></tbody>
+        </table>
+      </div>
+    </section>
+
     <article class="panel explainer">
       <h2>How Spell Piercing works</h2>
       <p>
         Spell Piercing doesn't add a flat amount of damage. It is the other side of the partial resist roll: each hit
         or tick at the full share rolls a step, <strong>+0%</strong>, <strong>+10%</strong>, <strong>+20%</strong>,
         and at high values <strong>+30%</strong>. In the combat log the bonus shows up as a negative
-        <code>resisted</code> number. Binary spells and most DoT ticks roll no bonus at all.
+        <code>resisted</code> number. Most DoT ticks roll no bonus at all.
       </p>
       <ol>
         <li>
@@ -201,10 +225,11 @@
         <li>
           <strong>Binary:</strong> a magic damage spell that has, besides the damage, a debuff on the target,
           an interrupt, or a dummy, script, energize or area-trigger effect. The average share is the chance to resist
-          the whole spell. One that lands takes no partial resist and no piercing bonus, nor do its ticks, so piercing
-          only lowers the chance of a full resist, down to 0. Frostbolt, Frost Nova, Cone of Cold, Ice Lance,
-          Frostfire Bolt, Blast Wave, Arcane Wrath, Flamestrike's cast, Immolate, Incinerate, Shadow Word: Death, Mind
-          Flay, Earth Shock, Frost Shock, Insect Swarm, Hurricane and Bane of Agony.
+          the whole spell, and one that lands takes no partial resist. Piercing lowers the chance of a full resist down
+          to 0, and past that the hit takes the bonus like a direct hit. Frostbolt, Frost Nova, Cone of Cold, Ice Lance,
+          Frostfire Bolt, Blast Wave, Arcane Wrath, Flamestrike's cast, Immolate, Incinerate, Shadow Word: Death and
+          Earth Shock. Binary ticks split: Mind Flay's and Insect Swarm's take the bonus at the full share, Hurricane's,
+          Entangling Roots', Bane of Agony's and Drain Soul's take none.
         </li>
       </ul>
 
@@ -216,9 +241,14 @@
         </li>
         <li>A Fireball log with more piercing shows the +30% step once the average passes 10%.</li>
         <li>
-          On the live realms binary spells take no bonus: Frost Nova 0 of 1,258 hits, Cone of Cold 0 of 1,595, Arcane
-          Wrath 0 of 1,787. Nor do ticks at a tenth: Shadow Word: Pain 0 of 515 ticks at 8 piercing, Flamestrike's ground
-          ticks 0 of 4,177. Spells at the full share do: Fire Blast 439 of 1,686 hits, Pyroblast's ticks 56 of 280.
+          Since build 71037 (19 November) binary hits take the bonus at the full rate: Frostbolt 1,863 of 6,276 hits
+          (1,802 expected), Cone of Cold 1,111 of 4,675, Arcane Wrath 898 of 3,385, Flamestrike's cast 994 of 3,235, Mind
+          Flay's ticks 483 of 5,398, Insect Swarm's 1,089 of 9,240. Before that build they took none.
+        </li>
+        <li>
+          Ticks at a tenth take none: Corruption, Siphon Life, Wrack, Shadow Word: Pain, Flame Shock and Moonfire at a
+          few percent of the full rate at most, Flamestrike's ground ticks 7 of 2,454, a level 60 warlock with 11
+          piercing 0 of 512. Hurricane's ticks took 19 of 7,577 where the full share expects 786.
         </li>
         <li>No live hit loses more than 75%, and on the mobs that resist that much, 75% is the top step.</li>
         <li>A caster with 1 piercing got no bonus in 1,791 hits, where the formula expects a few percent.</li>

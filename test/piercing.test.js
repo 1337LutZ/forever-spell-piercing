@@ -1,7 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { analyse, averageResist, resistanceAfterDebuffs, rollTenths } from "../piercing.js";
-
 const base = {
   level: 60,
   school: "frost",
@@ -106,18 +105,16 @@ test("a binary spell is fully resisted at the average, and one that lands takes 
   close(result.expected, 1000 * (1 - 100 / 599));
 });
 
-test("piercing lowers a binary spell's full resist chance to 0 and adds no bonus", () => {
+test("piercing lowers a binary spell's full resist chance to 0, and past that it rolls the bonus", () => {
   const partly = analyse({ ...base, hitType: "binary", targetResistance: 100, piercing: 60 });
   close(partly.fullResistChance, 40 / 539);
   close(partly.expected, 1000 * (1 - 40 / 539));
 
   const past = analyse({ ...base, hitType: "binary", targetResistance: 100, piercing: 150 });
+  const direct = analyse({ ...base, targetResistance: 100, piercing: 150 });
   assert.equal(past.fullResistChance, 0);
-  assert.deepEqual(
-    past.steps.map((s) => [s.percent, s.chance, s.damage]),
-    [[0, 1, 1000]],
-  );
-  close(past.expected, 1000);
+  assert.deepEqual(past.steps, direct.steps);
+  close(past.expected, 1000 * (1 + 50 / 549));
 });
 
 test("a tick at a tenth takes a tenth of the resist and no bonus from piercing", () => {
@@ -146,15 +143,12 @@ test("a tick at the full share takes the piercing bonus a tick at a tenth does n
   close(analyse({ ...base, hitType: "dot", piercing: 50 }).expected, 1000);
 });
 
-test("past the target's resistance, more piercing changes nothing on binary spells and ticks at a tenth", () => {
-  for (const hitType of ["binary", "dot"]) {
-    const atZero = analyse({ ...base, hitType, targetResistance: 100, piercing: 100 });
-    const past = analyse({ ...base, hitType, targetResistance: 100, piercing: 150 });
-    close(atZero.expected, 1000);
-    close(past.expected, atZero.expected);
-  }
+test("past the target's resistance, more piercing changes nothing on ticks at a tenth", () => {
+  const atZero = analyse({ ...base, hitType: "dot", targetResistance: 100, piercing: 100 });
+  const past = analyse({ ...base, hitType: "dot", targetResistance: 100, piercing: 150 });
+  close(atZero.expected, 1000);
+  close(past.expected, atZero.expected);
 });
-
 test("around an average of 74% the 80 and 90% steps land on 75%", () => {
   const result = analyse({ ...base, school: "shadow", targetResistance: (0.74 * 499) / 0.26 });
   close(result.average, 0.74);

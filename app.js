@@ -1,4 +1,5 @@
 import { analyse, expectedWithoutPiercing } from "./piercing.js";
+import { SPELLS } from "./spells.js";
 
 const RESIST_SCHOOLS = ["arcane", "fire", "frost", "nature", "shadow"];
 
@@ -18,7 +19,7 @@ const HIT_TYPE_HELP = {
     "Rolls the full share and takes the piercing bonus. Fire Blast, Fireball, Lightning Bolt, Blizzard's ticks, and the ticks of Devouring Plague, Pyroblast and Starshards.",
   dot: "Rolls a tenth of the share and takes no piercing bonus. Most DoT ticks: Shadow Word: Pain, Corruption, Flame Shock, Moonfire, Fireball's DoT, and Flamestrike's ground ticks.",
   binary:
-    "The average share is the chance to resist the whole spell. One that lands takes no partial resist and no piercing bonus, nor do its ticks. Frostbolt, Frost Nova, Cone of Cold, Arcane Wrath, Flamestrike's cast, Immolate, Mind Flay, Earth Shock, Insect Swarm.",
+    "The average share is the chance to resist the whole spell, and one that lands takes no partial resist. Once piercing passes the target's resistance it takes the bonus like a direct hit. Frostbolt, Frost Nova, Cone of Cold, Ice Lance, Arcane Wrath, Flamestrike's cast, Immolate's hit, Earth Shock. For binary ticks, pick the tick's own type: Mind Flay and Insect Swarm tick at the full share, Hurricane and Bane of Agony at a tenth.",
 };
 
 const form = document.getElementById("inputs");
@@ -130,10 +131,8 @@ function renderSummary(state, piercing, result) {
       `Your debuffs take off ${wasted} more resistance than the target has. Debuffs stop at 0, so that part adds nothing. Only Spell Piercing goes past 0.`,
     );
   }
-  if (state.school !== "holy" && state.hitType !== "direct" && result.effectiveResistance < 0) {
-    notes.push(
-      "Binary spells and ticks at a tenth take no piercing bonus, so piercing past the target's resistance adds nothing here.",
-    );
+  if (state.school !== "holy" && state.hitType === "dot" && result.effectiveResistance < 0) {
+    notes.push("Ticks at a tenth take no piercing bonus, so piercing past the target's resistance adds nothing here.");
   }
   if (state.hitType === "direct" && result.average > 0 && Math.abs(result.share - result.average) > 1e-9) {
     notes.push(
@@ -250,5 +249,54 @@ $("share").addEventListener("click", async () => {
   setTimeout(() => (button.textContent = "Copy link"), 1600);
 });
 
+const MARKS = {
+  true: ["✓", "yes", "Takes the bonus"],
+  false: ["✗", "no", "Takes no bonus"],
+  open: ["?", "open", "Not settled yet"],
+  null: ["–", "none", "No such part"],
+};
+
+function renderSpellTable() {
+  const body = $("spell-rows");
+  let lastClass = "";
+  for (const spell of SPELLS) {
+    if (spell.cls !== lastClass) {
+      lastClass = spell.cls;
+      const header = document.createElement("tr");
+      header.className = "class-row";
+      header.innerHTML = `<th colspan="5" scope="colgroup"></th>`;
+      header.firstElementChild.textContent = spell.cls;
+      body.append(header);
+    }
+    const row = document.createElement("tr");
+    row.innerHTML = `<th scope="row"></th><td></td><td class="mark"></td><td class="mark"></td><td></td>`;
+    const [name, school, hit, ticks, note] = row.children;
+    name.textContent = spell.name;
+    if (spell.binary) {
+      const tag = document.createElement("span");
+      tag.className = "tag";
+      tag.textContent = "binary";
+      name.append(" ", tag);
+    }
+    school.textContent = spell.school;
+    for (const [cell, value] of [
+      [hit, spell.hit],
+      [ticks, spell.ticks],
+    ]) {
+      const [symbol, kind, label] = MARKS[value];
+      cell.textContent = symbol;
+      cell.className = `mark ${kind}`;
+      cell.title = label;
+      cell.setAttribute("aria-label", label);
+    }
+    note.className = "spell-note";
+    note.textContent = [spell.source === "logs" ? "Counted in logs." : "From the rules.", spell.note ?? ""]
+      .join(" ")
+      .trim();
+    body.append(row);
+  }
+}
+
+renderSpellTable();
 writeState(stateFromHash());
 render();

@@ -73,7 +73,8 @@ export function rollTenths(a) {
 // Everything the page shows for one hit. hitType is "direct" for a direct hit, a channel tick that is
 // not binary or a tick at the full share, "dot" for a tick at a tenth of the share, and "binary" for a
 // binary spell. A binary spell resists in full on its hit roll with the average share as the chance,
-// and one that lands takes no partial resist and no bonus.
+// and one that lands takes no partial resist. Once piercing passes the target's resistance it rolls the
+// bonus like any other hit.
 export function analyse(options) {
   const curse = CURSE_OF_THE_ELEMENTS[options.curseRank] ?? CURSE_OF_THE_ELEMENTS[0];
   const input = { ...options, debuffReduction: options.debuffReduction + curse.resistance };
@@ -85,7 +86,7 @@ export function analyse(options) {
   let fullResistChance = 0;
   let steps;
   let share;
-  if (hitType === "binary") {
+  if (hitType === "binary" && average > 0) {
     fullResistChance = Math.max(0, average);
     steps = [{ percent: 0, chance: 1 - fullResistChance, damage: full }];
     share = fullResistChance;

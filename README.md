@@ -31,8 +31,12 @@ The math in `piercing.js` follows the live-realm resist rules in
 - A magic damage spell is binary when it has, besides the damage, a debuff on the target, an interrupt, or a
   dummy, script, energize or area-trigger effect: Frostbolt, Frost Nova, Cone of Cold, Arcane Wrath, Flamestrike's cast,
   Immolate, Shadow Word: Death, Mind Flay, Earth Shock, Insect Swarm and others. It is fully resisted with the average as
-  its chance. One that lands, and its ticks, take no partial resist and no piercing bonus, so piercing only lowers the
-  chance of a full resist, down to 0.
+  its chance, and one that lands takes no partial resist. Piercing lowers that chance down to 0, and past that a binary
+  hit takes the bonus like any other (since build 71037). Of the binary ticks, Mind Flay's and Insect Swarm's take it at
+  the full share; Hurricane's, Entangling Roots', Bane of Agony's and Drain Soul's take none.
+
+`spells.js` lists which hits and ticks of each class's damage spells take the bonus; the page shows it as a table below
+the calculator.
 
 The `8 × level + 19` constant is fitted to combat logs from levels 20 to 50.
 

@@ -410,6 +410,89 @@ button:focus-visible,
   font-variant-numeric: tabular-nums;
 }
 
+.spell-table {
+  margin: 16px auto 0;
+  max-width: 1120px;
+}
+
+.table-scroll {
+  overflow-x: auto;
+}
+
+.spell-table table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.spell-table th,
+.spell-table td {
+  text-align: left;
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--panel-border);
+  vertical-align: top;
+}
+
+.spell-table thead th {
+  font-size: 0.78rem;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.spell-table tbody th {
+  font-weight: 500;
+}
+
+.spell-table .class-row th {
+  padding-top: 16px;
+  color: var(--accent);
+  font-weight: 650;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.spell-table .mark {
+  text-align: center;
+  width: 56px;
+}
+
+.mark {
+  font-weight: 700;
+}
+
+.mark.yes {
+  color: var(--bonus);
+}
+
+.mark.no {
+  color: var(--resist);
+}
+
+.mark.open {
+  color: var(--accent);
+}
+
+.mark.none {
+  color: var(--muted);
+  font-weight: 400;
+}
+
+.tag {
+  font-size: 0.72rem;
+  color: var(--muted);
+  border: 1px solid var(--input-border);
+  border-radius: 4px;
+  padding: 0 5px;
+  white-space: nowrap;
+}
+
+.spell-note {
+  color: var(--muted);
+  font-size: 0.82rem;
+  min-width: 180px;
+}
+
 .explainer {
   margin-top: 16px;
   max-width: 1120px;
