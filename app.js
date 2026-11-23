@@ -252,7 +252,6 @@ $("share").addEventListener("click", async () => {
 const MARKS = {
   true: ["✓", "yes", "Takes the bonus"],
   false: ["✗", "no", "Takes no bonus"],
-  open: ["?", "open", "Not settled yet"],
   null: ["–", "none", "No such part"],
 };
 
