@@ -131,6 +131,9 @@ function renderSummary(state, piercing, result) {
       `Your debuffs take off ${wasted} more resistance than the target has. Debuffs stop at 0, so that part adds nothing. Only Spell Piercing goes past 0.`,
     );
   }
+  if (state.school !== "holy" && state.hitType !== "dot" && result.effectiveResistance < 0 && result.average === 0) {
+    notes.push("The bonus share is under 1%, which pays nothing. More piercing gets it over 1%.");
+  }
   if (state.school !== "holy" && state.hitType === "dot" && result.effectiveResistance < 0) {
     notes.push("Ticks at a tenth take no piercing bonus, so piercing past the target's resistance adds nothing here.");
   }

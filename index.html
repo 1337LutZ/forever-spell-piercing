@@ -196,6 +196,10 @@
           debuffs minus your piercing. A positive share is resisted damage, a negative one is bonus damage.
         </li>
         <li>
+          A bonus share under 1% pays nothing. At level 60, 5 piercing past the resistance does nothing and 6 does;
+          at lower levels fewer points reach 1%.
+        </li>
+        <li>
           Up to an average of 10%, each hit lands on 0, 10 or 20% at 1 &minus; 7.5a, 5a and 2.5a. Past 10%, every 10%
           step within 20 points of the average can come up, at 0.5 &minus; 2.5 &times; its distance from the average.
         </li>
@@ -255,7 +259,11 @@
           Totem 3 where 334 were.
         </li>
         <li>No live hit loses more than 75%, and on the mobs that resist that much, 75% is the top step.</li>
-        <li>A caster with 1 piercing got no bonus in 1,791 hits, where the formula expects a few percent.</li>
+        <li>
+          Below a 1% share piercing gives nothing: casters between 0.7% and 1% got a bonus on about 0.1 to 0.6% of
+          hits, where the formula expects 5 to 7%. From 1% up the bonus follows the formula, with no rounding to whole
+          percents. The same 5 piercing works at level 52 and does nothing at level 60.
+        </li>
         <li>
           The 8 &times; level + 19 constant is fitted to logs from levels 20 to 50, among them 15 piercing at level 50
           (5,756 hits, 26% with a bonus). Level 60 is the model's prediction until someone logs it.

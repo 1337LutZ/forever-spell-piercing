@@ -28,6 +28,13 @@ test("a debuff stops the target's resistance at 0, piercing does not", () => {
   close(averageResist({ ...base, targetResistance: 30, debuffReduction: 75, piercing: 10 }), -10 / 509);
 });
 
+test("piercing past the resistance pays nothing until the share reaches 1%", () => {
+  assert.equal(averageResist({ ...base, piercing: 5 }), 0);
+  close(averageResist({ ...base, piercing: 6 }), -6 / 505);
+  close(averageResist({ ...base, level: 52, piercing: 5 }), -5 / 440);
+  assert.equal(analyse({ ...base, piercing: 5 }).expected, 1000);
+});
+
 test("holy takes no resistance and no piercing", () => {
   assert.equal(averageResist({ ...base, school: "holy", targetResistance: 100, piercing: 50 }), 0);
 });

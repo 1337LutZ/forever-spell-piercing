@@ -21,6 +21,7 @@ The math in `piercing.js` follows the live-realm resist rules in
 - Debuffs lower the target's resistance, but not below 0.
 - Spell Piercing comes off what's left. Past 0, the rest is bonus damage on hits and ticks at the full share.
 - The average share is `R / (|R| + 8 × caster level + 19)`. Holy has no resistance.
+- A bonus share under 1% pays nothing (6 piercing past the resistance at level 60 is the first that counts).
 - Each hit rolls a whole 10% step around that average. No partial resist takes more than 75%: the 80, 90 and 100% steps
   land on 75%, so a spell that isn't binary is never fully resisted through the roll.
 - Direct hits, channel ticks that aren't binary, and the ticks of Devouring Plague, Pyroblast and Starshards roll the
