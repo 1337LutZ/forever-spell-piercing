@@ -10,11 +10,11 @@ export const SPELLS = [
   { cls: "Druid", name: "Hurricane", school: "Nature", hit: null, ticks: false, source: "logs", binary: true },
   { cls: "Druid", name: "Entangling Roots", school: "Nature", hit: null, ticks: false, source: "logs", binary: true },
 
-  { cls: "Hunter", name: "Arcane Shot", school: "Arcane", hit: true, ticks: null, source: "rule", note: "Leans yes, but few hunters have enough piercing to count." },
-  { cls: "Hunter", name: "Volley", school: "Arcane", hit: true, ticks: null, source: "rule", note: "Too few hunters with enough piercing to count." },
+  { cls: "Hunter", name: "Arcane Shot", school: "Arcane", hit: true, ticks: null, source: "logs", note: "177 bonuses in 2,100 hits from 26 hunters, 175 expected." },
+  { cls: "Hunter", name: "Volley", school: "Arcane", hit: true, ticks: null, source: "rule", note: "Leans no: 0 bonuses in 987 hits, but all from one hunter." },
   { cls: "Hunter", name: "Explosive Trap", school: "Fire", hit: true, ticks: false, source: "rule", note: "Too few hunters with enough piercing to count." },
-  { cls: "Hunter", name: "Immolation Trap", school: "Fire", hit: null, ticks: false, source: "rule", note: "Too few hunters with enough piercing to count." },
-  { cls: "Hunter", name: "Serpent Sting", school: "Nature", hit: null, ticks: false, source: "rule", note: "Too few hunters with enough piercing to count." },
+  { cls: "Hunter", name: "Immolation Trap", school: "Fire", hit: null, ticks: false, source: "logs", note: "0 bonuses in 191 ticks, 15 expected." },
+  { cls: "Hunter", name: "Serpent Sting", school: "Nature", hit: null, ticks: false, source: "logs", note: "1 +20% step in 2,114 ticks from 23 hunters, 58 expected." },
 
   { cls: "Mage", name: "Arcane Missiles", school: "Arcane", hit: true, ticks: null, source: "logs" },
   { cls: "Mage", name: "Arcane Explosion", school: "Arcane", hit: true, ticks: null, source: "logs" },
@@ -37,7 +37,7 @@ export const SPELLS = [
 
   { cls: "Priest", name: "Mind Blast", school: "Shadow", hit: true, ticks: null, source: "logs" },
   { cls: "Priest", name: "Shadow Word: Death", school: "Shadow", hit: true, ticks: null, source: "logs", binary: true },
-  { cls: "Priest", name: "Touch of Weakness", school: "Shadow", hit: true, ticks: null, source: "rule", note: "Too few hits to count yet.", binary: true },
+  { cls: "Priest", name: "Touch of Weakness", school: "Shadow", hit: true, ticks: null, source: "rule", note: "Unsettled: 9 bonuses in 90 hits, 10 expected; needs about 130.", binary: true },
   { cls: "Priest", name: "Mind Flay", school: "Shadow", hit: null, ticks: true, source: "logs", binary: true },
   { cls: "Priest", name: "Devouring Plague", school: "Shadow", hit: null, ticks: true, source: "logs" },
   { cls: "Priest", name: "Shadow Word: Pain", school: "Shadow", hit: null, ticks: false, source: "logs" },
@@ -55,7 +55,7 @@ export const SPELLS = [
   { cls: "Shaman", name: "Fire Nova", school: "Fire", hit: true, ticks: null, source: "logs" },
   { cls: "Shaman", name: "Lightning Shield", school: "Nature", hit: true, ticks: null, source: "logs" },
   { cls: "Shaman", name: "Flametongue Attack", school: "Fire", hit: true, ticks: null, source: "logs" },
-  { cls: "Shaman", name: "Frostbrand Attack", school: "Frost", hit: true, ticks: null, source: "rule", note: "Leans yes: 11 bonuses in 46 hits.", binary: true },
+  { cls: "Shaman", name: "Frostbrand Attack", school: "Frost", hit: true, ticks: null, source: "logs", note: "20 bonuses in 82 hits from 8 shamans, 10 expected; still few hits.", binary: true },
   {
     cls: "Shaman",
     name: "Magma Totem, Searing Totem",
@@ -99,7 +99,7 @@ export const SPELLS = [
     source: "logs",
     note: "About 1% of ticks show a bonus whatever the piercing, so it isn't piercing.",
   },
-  { cls: "Warlock", name: "Bane of Doom", school: "Shadow", hit: null, ticks: false, source: "rule", note: "Too few ticks to count yet." },
+  { cls: "Warlock", name: "Bane of Doom", school: "Shadow", hit: null, ticks: false, source: "logs", note: "0 bonuses in 44 ticks, 5 expected; still few ticks." },
   { cls: "Warlock", name: "Drain Life", school: "Shadow", hit: null, ticks: false, source: "logs" },
   { cls: "Warlock", name: "Drain Soul", school: "Shadow", hit: null, ticks: false, source: "logs", binary: true },
 ];
